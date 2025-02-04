@@ -6,10 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.nobsv2.Command;
+import com.example.nobsv2.exceptions.ProductNotFoundException;
 import com.example.nobsv2.product.model.Product;
 import com.example.nobsv2.product.model.ProductDTO;
 import com.example.nobsv2.product.model.ProductRepository;
 import com.example.nobsv2.product.model.UpdateProductCommand;
+import com.example.nobsv2.product.validators.ProductValidator;
 
 @Service
 public class UpdateProductService implements Command<UpdateProductCommand, ProductDTO>{
@@ -26,11 +28,13 @@ public class UpdateProductService implements Command<UpdateProductCommand, Produ
         if(productOptional.isPresent()){
             Product product = command.getProduct();
             product.setId(command.getId());
+            ProductValidator.execute(product);
             productRepository.save(product);
             return ResponseEntity.ok(new ProductDTO(product));
         }
 
 
-        return null;
+        throw new ProductNotFoundException();
+
     }
 }  
